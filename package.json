@@ -1,0 +1,19 @@
+{
+  "name": "sziget-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Unsere Sziget-App 2027 für sechs Leute",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/dev.js",
+    "worker": "npx wrangler dev --config worker/wrangler.toml --local --port 8789",
+    "check-secrets": "node scripts/check-secrets.js",
+    "deploy-worker": "npx wrangler deploy --config worker/wrangler.toml"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "wrangler": "^4.162.0"
+  }
+}

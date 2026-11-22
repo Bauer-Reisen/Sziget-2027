@@ -1,0 +1,13 @@
+node_modules/
+.wrangler/
+worker/.wrangler/
+worker/.dev.vars
+.dev.vars
+*.log
+
+# Privat: Namen der sechs (kommen nur in die Datenbank, nie ins öffentliche Repository)
+worker/personen.sql
+
+# Planung mit Namen und Reisedetails: nur lokal
+PLAN.md
+STAND.md

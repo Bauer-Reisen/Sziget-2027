@@ -1,0 +1,17 @@
+{
+  "name": "Insel 27 – unsere Festival-App",
+  "short_name": "Insel 27",
+  "description": "Line-up, Tagesplan und Treffpunkte für uns sechs – auch ohne Netz",
+  "lang": "de",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1b163a",
+  "theme_color": "#1b163a",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

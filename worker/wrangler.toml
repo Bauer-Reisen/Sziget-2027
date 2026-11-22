@@ -1,0 +1,24 @@
+# Einstellungen für den Cloudflare Worker „sziget".
+# Hier steht NICHTS Geheimes. Der gemeinsame Code wird als Secret GROUP_CODE eingetragen
+# (Befehl: npx wrangler secret put GROUP_CODE --config worker/wrangler.toml).
+
+name = "sziget"
+main = "index.js"
+compatibility_date = "2026-06-01"
+
+[vars]
+# Nur diese Websites dürfen den Worker benutzen (durch Komma getrennt).
+ALLOWED_ORIGINS = "https://bauer-reisen.github.io,http://localhost:5820"
+
+# Schutz vor Raten des Codes: höchstens 10 Versuche pro Minute und Internet-Anschluss
+[[ratelimits]]
+name = "LOGIN_LIMITER"
+namespace_id = "2027"
+  [ratelimits.simple]
+  limit = 10
+  period = 60
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sziget"
+database_id = "b061629c-0bc9-4056-ad9f-d6ea05d60b2f"
