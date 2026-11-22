@@ -1,7 +1,7 @@
 // Rundgang beim allerersten Öffnen (wie in der Film-App): Punkte oben antippbar,
 // ab Karte 2 „← Zurück" plus kleiner Link „Rundgang überspringen". Unter „Mehr" wieder aufrufbar.
-import { dialog, esc } from './ui.js?v=0.1.0';
-import { STEPS } from './hilfe.js?v=0.1.0';
+import { dialog, esc } from './ui.js?v=0.1.1';
+import { STEPS } from './hilfe.js?v=0.1.1';
 
 export async function runTour(name = '') {
   const steps = STEPS;
@@ -24,10 +24,16 @@ export async function runTour(name = '') {
         { label: last ? 'Los geht’s' : 'Weiter', value: 'next', primary: true },
       ],
     });
+    // Punkte oben antippen = zu dieser Karte springen; „Rundgang überspringen" = beenden.
+    // Erst merken, wohin es geht, dann diesen Dialog schließen (ohne Ergebnis).
     let sprung = null;
-    [...document.querySelectorAll('dialog')].pop()?.querySelectorAll('[data-schritt]')
-      // (der Dialog selbst schließt sich bei jedem Knopf ohne eigenen Wert, danach springen wir)
-      .forEach((b) => b.addEventListener('click', () => { sprung = b.dataset.schritt; }));
+    const dlg = [...document.querySelectorAll('dialog.dlg')].pop();
+    dlg?.querySelectorAll('[data-schritt]').forEach((b) => b.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      sprung = b.dataset.schritt;
+      dlg.dispatchEvent(new Event('cancel', { cancelable: true }));
+    }));
     const res = await offen;
     if (sprung === 'ende') return;
     if (sprung !== null) { i = Number(sprung); continue; }

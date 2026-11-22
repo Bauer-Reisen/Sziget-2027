@@ -36,7 +36,9 @@ export function dialog({ title, body = '', buttons = [{ label: 'OK', value: true
       }
       finish(btn);
     });
-    d.querySelectorAll('button[type="button"]').forEach((b) => b.addEventListener('click', () => finish(buttons[b.value])));
+    // Nur die Knöpfe unten schließen den Dialog. Andere Knöpfe im Inhalt (z. B. Punkte im Rundgang)
+    // regeln das selbst über d.close() bzw. das Ereignis „cancel".
+    d.querySelectorAll('.dlg-buttons button[type="button"]').forEach((b) => b.addEventListener('click', () => finish(buttons[b.value])));
     d.addEventListener('cancel', (e) => { e.preventDefault(); finish(null); });
     d.showModal();
   });

@@ -4,7 +4,7 @@
 // - Updates: app.js merkt eine neue Version (version.json) und lädt mit ?v=<neu> – das geht übers Netz.
 // - Daten aus der Datenbank (Worker) werden hier NICHT gespeichert, die hebt die App selbst auf.
 
-const VERSION = '0.1.0';
+const VERSION = '0.1.1';
 const CACHE = 'insel-' + VERSION;
 const DATEIEN = [
   './', 'index.html', 'manifest.webmanifest', 'style.css', 'version.json',

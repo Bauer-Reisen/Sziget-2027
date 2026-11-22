@@ -1,5 +1,5 @@
 // Reiterleiste unten. Weitere Reiter (Line-up, Heute, Infos) kommen mit den nächsten Abschnitten.
-import { esc } from './ui.js?v=0.1.0';
+import { esc } from './ui.js?v=0.1.1';
 
 const ICON = {
   start: '<circle cx="12" cy="13" r="4.5"/><path d="M12 3v2.5M4.9 6.4l1.8 1.8M19.1 6.4l-1.8 1.8M3 20h18"/>',

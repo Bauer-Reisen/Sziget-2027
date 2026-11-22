@@ -1,6 +1,6 @@
 {
   "name": "sziget-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Unsere Sziget-App 2027 für sechs Leute",
   "type": "module",

@@ -1,6 +1,6 @@
 // Gemeinsamer Zustand und Helfer für alle Seiten.
-import { store } from './store.js?v=0.1.0';
-import { FESTIVAL, DAY_START_HOUR } from './config.js?v=0.1.0';
+import { store } from './store.js?v=0.1.1';
+import { FESTIVAL, DAY_START_HOUR } from './config.js?v=0.1.1';
 
 export const ctx = { people: null };
 
