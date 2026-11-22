@@ -6,6 +6,9 @@
 // Hier im Code steht nichts Geheimes.
 
 const TOKEN_DAYS = 400; // Ausweis gilt gut ein Jahr (bis nach dem Festival)
+const MAX_ACTS = 600;   // Bremse gegen versehentliches Massen-Eintragen
+const LEVELS = ['muss', 'gern', 'egal'];
+const FESTIVAL_DAYS = ['2027-08-10', '2027-08-11', '2027-08-12', '2027-08-13', '2027-08-14'];
 
 export default {
   async fetch(request, env) {
@@ -63,6 +66,61 @@ export default {
         });
       }
 
+      // Wer bin ich? (Name aus der Auswahl; reicht unter sechs Freunden)
+      const me = await db.prepare('SELECT id, name FROM persons WHERE id = ?').bind(request.headers.get('X-Person') || '').first();
+      if (!me) return reply(400, { error: 'Bitte zuerst deinen Namen wählen.' });
+      const run = (sql, ...args) => db.prepare(sql).bind(...args).run();
+      const body = method === 'GET' ? {} : await request.json().catch(() => ({}));
+
+      // ---------- Line-up: alles auf einmal (klein: ~100 Acts × 6 Personen) ----------
+      if (path === '/api/lineup' && method === 'GET') {
+        return reply(200, {
+          acts: await all('SELECT id, name, day, stage, start, end_time AS "end", created_by AS by, updated FROM acts WHERE deleted = 0 ORDER BY name COLLATE NOCASE'),
+          marks: await all('SELECT person_id AS person, act_id AS act, level FROM marks'),
+          now: Date.now(),
+        });
+      }
+
+      // Act eintragen (id vom Handy → zweimal senden schadet nicht)
+      if (path === '/api/acts' && method === 'POST') {
+        const id = clip(body.id, 60);
+        const name = clip(body.name, 80).trim();
+        if (!/^[\w-]{4,60}$/.test(id) || !name) return reply(400, { error: 'Bitte einen Namen eingeben.' });
+        const n = (await db.prepare('SELECT COUNT(*) AS n FROM acts').first()).n;
+        if (n >= MAX_ACTS) return reply(400, { error: 'Das Line-up ist voll.' });
+        await run(`INSERT INTO acts (id, name, day, created_by, updated_by, updated) VALUES (?, ?, ?, ?, ?, ?)
+                   ON CONFLICT(id) DO UPDATE SET deleted = 0`, id, name, day(body.day), me.id, me.id, Date.now());
+        return reply(200, { ok: true });
+      }
+
+      let m = /^\/api\/acts\/([\w-]{4,60})$/.exec(path);
+      if (m && method === 'PUT') {
+        const name = clip(body.name, 80).trim();
+        if (!name) return reply(400, { error: 'Bitte einen Namen eingeben.' });
+        await run('UPDATE acts SET name = ?, day = ?, updated_by = ?, updated = ? WHERE id = ?', name, day(body.day), me.id, Date.now(), m[1]);
+        return reply(200, { ok: true });
+      }
+      if (m && method === 'DELETE') {
+        await run('UPDATE acts SET deleted = 1, updated_by = ?, updated = ? WHERE id = ?', me.id, Date.now(), m[1]);
+        return reply(200, { ok: true });
+      }
+
+      // Eigene Markierung setzen oder löschen (level leer = keine Markierung)
+      m = /^\/api\/marks\/([\w-]{4,60})$/.exec(path);
+      if (m && method === 'PUT') {
+        const level = String(body.level || '');
+        if (!level) {
+          await run('DELETE FROM marks WHERE person_id = ? AND act_id = ?', me.id, m[1]);
+          return reply(200, { ok: true });
+        }
+        if (!LEVELS.includes(level)) return reply(400, { error: 'Unbekannte Markierung.' });
+        const act = await db.prepare('SELECT id FROM acts WHERE id = ?').bind(m[1]).first();
+        if (!act) return reply(404, { error: 'Diesen Act gibt es nicht mehr.' });
+        await run(`INSERT INTO marks (person_id, act_id, level, updated) VALUES (?, ?, ?, ?)
+                   ON CONFLICT(person_id, act_id) DO UPDATE SET level = excluded.level, updated = excluded.updated`, me.id, m[1], level, Date.now());
+        return reply(200, { ok: true });
+      }
+
       return reply(404, { error: 'Unbekannte Adresse.' });
     } catch (err) {
       console.error(err);
@@ -73,6 +131,8 @@ export default {
 
 // ---------- Helfer ----------
 const normCode = (s) => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+const clip = (s, n) => String(s ?? '').slice(0, n);
+const day = (s) => (FESTIVAL_DAYS.includes(s) ? s : null); // nur echte Festivaltage, sonst „noch offen"
 
 // ---------- Ausweis (Token) ----------
 const enc = new TextEncoder();

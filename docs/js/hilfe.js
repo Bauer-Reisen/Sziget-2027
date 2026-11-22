@@ -9,8 +9,8 @@ export const STEPS = [
     text: 'Für uns sechs auf der Insel: wer wann was sehen will, wo wir uns treffen und was wichtig ist. Alles <strong>auch ohne Netz</strong> – auf dem Festival ist das Netz oft überlastet.',
   },
   {
-    id: 'lineup', stand: '0.1.0', icon: '🎤', title: 'Line-up markieren',
-    text: 'Bald markiert jede Person auf dem eigenen Handy die Acts: <strong>Muss</strong>, <strong>Gern</strong> oder <strong>Egal</strong>. Dann sieht man sofort, wen mehrere von uns sehen wollen.',
+    id: 'lineup', stand: '0.2.0', icon: '🎤', title: 'Line-up markieren',
+    text: 'Im Reiter <strong>Line-up</strong> markierst du jeden Act mit <strong>Muss</strong>, <strong>Gern</strong> oder <strong>Egal</strong>. Unter <strong>Gemeinsam</strong> siehst du, wen die meisten von uns sehen wollen. Fehlt ein Act, trägst du ihn einfach ein.',
   },
   {
     id: 'heute', stand: '0.1.0', icon: '🗓️', title: 'Unser Tag',
@@ -27,4 +27,13 @@ export const STEPS = [
 ];
 
 // Neueste zuerst. Nur sichtbare Neuerungen, keine Reparaturen.
-export const NEWS = [];
+export const NEWS = [
+  {
+    v: '0.2.0', karte: 'lineup', title: 'Das Line-up ist da',
+    items: [
+      'Unten gibt es den neuen Reiter <strong>Line-up</strong> mit den ersten 20 Acts.',
+      'Tippe bei jedem Act <strong>Muss</strong>, <strong>Gern</strong> oder <strong>Egal</strong>. Unter <strong>Gemeinsam</strong> steht oben, wen die meisten von uns sehen wollen.',
+      'Fehlt ein Act? Unten auf <strong>„+ Act eintragen"</strong>. Klappt auch ohne Netz.',
+    ],
+  },
+];

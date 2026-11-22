@@ -1,9 +1,10 @@
 // Startseite: Countdown, Offline-Zustand, Home-Bildschirm-Hinweis, was als Nächstes kommt.
-import { esc } from './ui.js?v=0.1.1';
-import { me, festivalStatus, fmtDate } from './ctx.js?v=0.1.1';
-import { FESTIVAL } from './config.js?v=0.1.1';
-import { installBanner, wireInstall } from './install.js?v=0.1.1';
-import { offlineState, online } from './offline.js?v=0.1.1';
+import { esc } from './ui.js?v=0.2.0';
+import { me, festivalStatus, fmtDate } from './ctx.js?v=0.2.0';
+import { FESTIVAL } from './config.js?v=0.2.0';
+import { installBanner, wireInstall } from './install.js?v=0.2.0';
+import { offlineState, online } from './offline.js?v=0.2.0';
+import { lineup, onChange } from './sync.js?v=0.2.0';
 
 function countdown() {
   const s = festivalStatus();
@@ -32,6 +33,23 @@ function countdown() {
     </div>`;
 }
 
+// Kurzer Stand zum Line-up mit Sprung dorthin
+function lineupCard() {
+  const lu = lineup();
+  const meId = me()?.id;
+  const mine = lu.marks.filter((m) => m.person === meId).length;
+  const counts = new Map();
+  for (const m of lu.marks) if (m.level !== 'egal') counts.set(m.act, (counts.get(m.act) || 0) + 1);
+  const top = [...counts.entries()].filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1]).slice(0, 3)
+    .map(([id, n]) => `${esc(lu.acts.find((a) => a.id === id)?.name || '')} (${n})`);
+  return `
+    <a class="card card-link" href="#/lineup" id="lu-card">
+      <h3>Line-up →</h3>
+      <p>${mine ? `Du hast ${mine} von ${lu.acts.length} Acts markiert.` : `${lu.acts.length} Acts warten auf deine Markierung.`}</p>
+      ${top.length ? `<p class="hint">Gemeinsam vorne: ${top.join(', ')}</p>` : ''}
+    </a>`;
+}
+
 const OFFLINE_TEXT = {
   bereit: ['ok', 'Offline bereit ✓', 'Die App ist auf diesem Handy gespeichert und läuft auch ohne Netz.'],
   laedt: ['wait', 'Wird für offline gespeichert …', 'Lass die App kurz offen, solange Netz da ist.'],
@@ -48,16 +66,22 @@ export async function renderStart(view) {
       ${countdown()}
       <div id="offline"></div>
       ${installBanner()}
+      ${lineupCard()}
       <div class="card">
         <h3>Was als Nächstes kommt</h3>
         <ul class="next">
-          <li><strong>Line-up markieren:</strong> Muss, Gern oder Egal – und sehen, wen wir zusammen sehen wollen.</li>
           <li><strong>Infos ohne Netz:</strong> Regeln, Notfall, Anreise und Camping.</li>
           <li><strong>Unser Tag</strong> (sobald der Zeitplan da ist, ca. Juni): wer ist wann wo, Treffpunkte.</li>
         </ul>
       </div>
     </section>`;
   wireInstall(view);
+  // Neuer Stand vom Worker → Line-up-Karte auffrischen
+  const off = onChange(() => {
+    const card = view.querySelector('#lu-card');
+    if (!card) return off();
+    card.outerHTML = lineupCard();
+  });
   await showOffline(view);
 }
 

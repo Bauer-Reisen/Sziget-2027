@@ -1,6 +1,6 @@
 // Verbindung zum Worker. Der Ausweis (Token) liegt nur auf diesem Handy.
-import { API } from './config.js?v=0.1.1';
-import { store } from './store.js?v=0.1.1';
+import { API } from './config.js?v=0.2.0';
+import { store } from './store.js?v=0.2.0';
 
 export const newId = () => (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36));
 
@@ -14,12 +14,12 @@ export class ApiError extends Error {
   constructor(status, message) { super(message); this.status = status; }
 }
 
-export async function call(path, { method = 'GET', body, auth = true } = {}) {
+export async function call(path, { method = 'GET', body, auth = true, as } = {}) {
   const headers = {};
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   const token = store.get('token');
   if (auth && token) headers.Authorization = `Bearer ${token}`;
-  const person = store.get('person');
+  const person = as || store.get('person'); // as: wer die Änderung gemacht hat (Warteschlange)
   if (person) headers['X-Person'] = person;
   let res;
   try {
