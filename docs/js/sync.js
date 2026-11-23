@@ -3,9 +3,9 @@
 // - Jede Änderung kommt sofort in die eigene Ansicht UND in die Warteschlange.
 // - Die Warteschlange wird gesendet: beim Öffnen, wenn Netz zurückkommt, und jede Minute, solange die App offen ist.
 // - Doppeltes Senden ist harmlos: neue Acts tragen eine Kennung vom Handy, Markierungen gehören je einer Person.
-import { call, ApiError, newId } from './api.js?v=0.4.0';
-import { store } from './store.js?v=0.4.0';
-import { toast } from './ui.js?v=0.4.0';
+import { call, ApiError, newId } from './api.js?v=0.5.0';
+import { store } from './store.js?v=0.5.0';
+import { toast } from './ui.js?v=0.5.0';
 
 const listeners = new Set();
 export const onChange = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
@@ -122,11 +122,32 @@ export function addAct(name, day, person) {
   return id;
 }
 
-export function editAct(id, name, day) {
+// f = { name, day, stage, start, end } – Bühne und Uhrzeiten leer = noch offen
+export function editAct(id, f) {
+  const act = { id, name: f.name, day: f.day || null, stage: f.stage || null, start: f.start || null, end: f.end || null };
   enqueue({
     key: `act|${id}`,
-    path: `/api/acts/${id}`, method: 'PUT', body: { name, day },
-    apply: { t: 'act-edit', act: { id, name, day: day || null } },
+    path: `/api/acts/${id}`, method: 'PUT', body: { name: act.name, day: act.day, stage: act.stage || '', start: act.start || '', end: act.end || '' },
+    apply: { t: 'act-edit', act },
+  });
+}
+
+// Treffpunkte je Festivaltag = letzter Stand + noch nicht gesendete Änderungen
+export function meets() {
+  const m = new Map((snapshot?.meets || []).map((x) => [x.day, x]));
+  for (const op of queue()) {
+    const a = op.apply;
+    if (a?.t !== 'meet') continue;
+    if (a.place) m.set(a.day, { day: a.day, place: a.place, time: a.time || null, by: op.as, updated: op.at }); else m.delete(a.day);
+  }
+  return m;
+}
+
+export function setMeet(day, place, time) {
+  enqueue({
+    key: `meet|${day}`,
+    path: `/api/meets/${day}`, method: 'PUT', body: { place, time },
+    apply: { t: 'meet', day, place, time },
   });
 }
 

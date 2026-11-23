@@ -1,10 +1,10 @@
 // Startseite: Countdown, Offline-Zustand, Home-Bildschirm-Hinweis, was als Nächstes kommt.
-import { esc } from './ui.js?v=0.4.0';
-import { me, festivalStatus, fmtDate } from './ctx.js?v=0.4.0';
-import { FESTIVAL } from './config.js?v=0.4.0';
-import { installBanner, wireInstall } from './install.js?v=0.4.0';
-import { offlineState, online } from './offline.js?v=0.4.0';
-import { lineup, onChange } from './sync.js?v=0.4.0';
+import { esc } from './ui.js?v=0.5.0';
+import { me, festivalStatus, fmtDate } from './ctx.js?v=0.5.0';
+import { FESTIVAL } from './config.js?v=0.5.0';
+import { installBanner, wireInstall } from './install.js?v=0.5.0';
+import { offlineState, online } from './offline.js?v=0.5.0';
+import { lineup, onChange } from './sync.js?v=0.5.0';
 
 function countdown() {
   const s = festivalStatus();
@@ -67,12 +67,10 @@ export async function renderStart(view) {
       <div id="offline"></div>
       ${installBanner()}
       ${lineupCard()}
-      <div class="card">
-        <h3>Was als Nächstes kommt</h3>
-        <ul class="next">
-          <li><strong>Unser Tag</strong> (sobald der Zeitplan da ist, ca. Juni): wer ist wann wo, Treffpunkte.</li>
-        </ul>
-      </div>
+      <a class="card card-link" href="#/heute">
+        <h3>Unser Tag →</h3>
+        <p>Wer wann wo hin will, Überschneidungen und der Treffpunkt. Uhrzeiten kommen mit dem Zeitplan (ca. Juni).</p>
+      </a>
     </section>`;
   wireInstall(view);
   // Neuer Stand vom Worker → Line-up-Karte auffrischen

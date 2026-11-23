@@ -17,8 +17,8 @@ export const STEPS = [
     text: 'Im Reiter <strong>Infos</strong>: Notrufnummern, Regeln, was mit darf, unsere <strong>gemeinsame Kasse</strong> (Tricount) und was bei Anreise und Camping am schlauesten ist.',
   },
   {
-    id: 'heute', stand: '0.1.0', icon: '🗓️', title: 'Unser Tag',
-    text: 'Sobald der Zeitplan erscheint (ungefähr im Juni), macht die App daraus einen <strong>Plan für jeden Tag</strong>: wer ist wann wo, wo gibt es Überschneidungen, wo treffen wir uns.',
+    id: 'heute', stand: '0.5.0', icon: '🗓️', title: 'Unser Tag',
+    text: 'Im Reiter <strong>Heute</strong> siehst du für jeden Festivaltag, wer wann wo hin will, wo sich deine Acts <strong>überschneiden</strong> und wo wir uns treffen. Uhrzeiten trägst du im Line-up ein (Act antippen → Ändern), sobald der Zeitplan da ist.',
   },
   {
     id: 'offline', stand: '0.1.0', icon: '📶', title: 'Ohne Netz',
@@ -32,6 +32,15 @@ export const STEPS = [
 
 // Neueste zuerst. Nur sichtbare Neuerungen, keine Reparaturen.
 export const NEWS = [
+  {
+    v: '0.5.0', karte: 'heute', title: 'Neuer Reiter: Heute',
+    items: [
+      'Unter <strong>Heute</strong> steht für jeden Festivaltag, wer wann wo hin will – mit Namen.',
+      'Überschneiden sich zwei deiner Acts, steht dort eine <strong>Warnung</strong>.',
+      '<strong>Treffpunkt</strong> pro Tag und ein fester <strong>Plan B</strong>, falls sich jemand verliert.',
+      'Bühne und Uhrzeit trägst du im Line-up ein: Act antippen → Ändern. Der echte Zeitplan kommt etwa im Juni.',
+    ],
+  },
   {
     v: '0.4.0', karte: 'infos', title: 'Neuer Reiter: Infos',
     items: [

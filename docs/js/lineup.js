@@ -1,11 +1,11 @@
 // Line-up: Acts eintragen, jede Person markiert Muss / Gern / Egal, alle sehen die Markierungen der Gruppe.
 // Geht auch ohne Netz (Warteschlange in sync.js).
-import { esc, dialog, toast } from './ui.js?v=0.4.0';
-import { ctx, me, fmtDate } from './ctx.js?v=0.4.0';
-import { store } from './store.js?v=0.4.0';
-import { FESTIVAL_DAYS, LINEUP_STAND } from './config.js?v=0.4.0';
-import { ACT_INFO, INFO_STAND, LIVE_LABEL, spotifyArtist, spotifySearch, spotifyEmbed } from './actinfo.js?v=0.4.0';
-import { lineup, setMark, addAct, editAct, deleteAct, onChange, pending, lastSync, flush, refresh } from './sync.js?v=0.4.0';
+import { esc, dialog, toast } from './ui.js?v=0.5.0';
+import { ctx, me, fmtDate } from './ctx.js?v=0.5.0';
+import { store } from './store.js?v=0.5.0';
+import { FESTIVAL_DAYS, LINEUP_STAND } from './config.js?v=0.5.0';
+import { ACT_INFO, INFO_STAND, LIVE_LABEL, spotifyArtist, spotifySearch, spotifyEmbed } from './actinfo.js?v=0.5.0';
+import { lineup, setMark, addAct, editAct, deleteAct, onChange, pending, lastSync, flush, refresh } from './sync.js?v=0.5.0';
 
 const LEVELS = [
   ['muss', 'Muss'],
@@ -14,6 +14,8 @@ const LEVELS = [
 ];
 const norm = (s) => s.toLocaleLowerCase('de').replace(/[^\p{L}\p{N}]+/gu, '');
 const dayShort = (iso) => (iso ? fmtDate(iso, { weekday: 'short', day: 'numeric', month: 'numeric' }) : '');
+// „Fr. 13.8. 21:30" – im Steckbrief mit Ende und Bühne
+const when = (a, long) => [dayShort(a.day), a.start ? (long && a.end ? `${a.start}–${a.end}` : a.start) : '', long && a.stage ? a.stage : ''].filter(Boolean).join(' · ');
 const nameOf = (id) => ctx.people?.persons.find((p) => p.id === id)?.name || id;
 const order = () => (ctx.people?.persons || []).map((p) => p.id);
 
@@ -145,7 +147,7 @@ function paintList(view, lu = lineup()) {
               <span class="act-genre">${info?.live === 3 ? '<span class="act-live">🔥 Live-Tipp</span> ' : ''}${esc(info?.genre || 'Antippen für mehr')}</span>
             </span>
           </button>
-          ${a.day ? `<span class="act-day">${esc(dayShort(a.day))}</span>` : ''}
+          ${a.day ? `<span class="act-day">${esc(when(a))}</span>` : ''}
           ${together >= 2 ? `<span class="act-count" title="So viele von uns wollen hin">${together} 👥</span>` : ''}
         </div>
         ${who ? `<p class="act-who">${mode === 'gruppe' ? '' : '<span class="who-others">Andere:</span> '}${who}</p>` : ''}
@@ -204,7 +206,7 @@ async function detailDialog(id) {
   const body = info ? `
     <div class="ad">
       ${info.img ? `<img class="ad-img" src="${esc(info.img)}" alt="" crossorigin="anonymous" referrerpolicy="no-referrer">` : ''}
-      <p class="ad-meta"><strong>${esc(info.genre)}</strong><br>${esc(info.from)}${a.day ? ` · spielt ${esc(dayShort(a.day))}` : ''}</p>
+      <p class="ad-meta"><strong>${esc(info.genre)}</strong><br>${esc(info.from)}${a.day ? ` · spielt ${esc(when(a, true))}` : ''}</p>
       <p>${esc(info.about)}</p>
       <div class="ad-live${info.live === 3 ? ' is-top' : ''}">
         <h3>Wie sind sie live? ${flames ? `<span>${flames} ${esc(LIVE_LABEL[info.live])}</span>` : ''}</h3>
@@ -217,7 +219,7 @@ async function detailDialog(id) {
       <p class="hint">${esc(INFO_STAND)} · eigene Zusammenfassung aus Presse und Live-Kritiken.</p>
     </div>` : `
     <div class="ad">
-      <p>${a.day ? `Spielt ${esc(dayShort(a.day))}. ` : ''}Zu diesem Act gibt es noch keinen Steckbrief.</p>
+      <p>${a.day ? `Spielt ${esc(when(a, true))}. ` : ''}Zu diesem Act gibt es noch keinen Steckbrief.</p>
       <p><a class="btn btn-wide" href="${esc(spotifySearch(a.name))}" target="_blank" rel="noopener">In Spotify suchen</a></p>
     </div>`;
 
@@ -252,11 +254,26 @@ async function editDialog(id) {
         <input id="act-name" name="name" maxlength="80" autocomplete="off" value="${esc(a.name)}" required>
         <label for="act-day">Tag</label>
         <select id="act-day" name="day">${dayOptions(a.day || '')}</select>
+        <label for="act-stage">Bühne</label>
+        <input id="act-stage" name="stage" maxlength="40" autocomplete="off" list="stages" value="${esc(a.stage || '')}" placeholder="z. B. Main Stage">
+        <datalist id="stages">${[...new Set(lineup().acts.map((x) => x.stage).filter(Boolean))].sort().map((s) => `<option value="${esc(s)}">`).join('')}</datalist>
+        <div class="time-row">
+          <div><label for="act-start">Beginn</label><input id="act-start" name="start" type="time" value="${esc(a.start || '')}"></div>
+          <div><label for="act-end">Ende</label><input id="act-end" name="end" type="time" value="${esc(a.end || '')}"></div>
+        </div>
+        <p class="hint">Nach Mitternacht? Einfach z. B. 01:30 eintragen – zählt zum Festivaltag davor.</p>
       </div>`,
     buttons: [{ label: 'Löschen', value: 'del' }, { label: 'Abbrechen', value: 'no' }, { label: 'Speichern', value: 'ok', primary: true }],
-    validate: (f) => ((f.name || '').trim() ? '' : 'Bitte einen Namen eingeben.'),
+    validate: (f) => {
+      if (!(f.name || '').trim()) return 'Bitte einen Namen eingeben.';
+      if ((f.start || f.end) && !f.day) return 'Für eine Uhrzeit bitte auch den Tag wählen.';
+      return '';
+    },
   });
-  if (res?.value === 'ok') editAct(id, res.fields.name.trim(), res.fields.day);
+  if (res?.value === 'ok') {
+    const f = res.fields;
+    editAct(id, { name: f.name.trim(), day: f.day, stage: (f.stage || '').trim(), start: f.start || '', end: f.end || '' });
+  }
   if (res?.value === 'del') {
     const n = lineup().marks.filter((m) => m.act === id).length;
     const ok = await dialog({

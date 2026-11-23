@@ -45,3 +45,12 @@ CREATE TABLE IF NOT EXISTS settings (
   updated_by TEXT,
   updated    INTEGER NOT NULL DEFAULT 0
 );
+
+-- Treffpunkt je Festivaltag (der zuletzt eingetragene gilt; Festivaltag läuft 6 bis 6 Uhr).
+CREATE TABLE IF NOT EXISTS meets (
+  day        TEXT PRIMARY KEY,
+  place      TEXT NOT NULL,
+  time       TEXT,
+  updated_by TEXT,
+  updated    INTEGER NOT NULL DEFAULT 0
+);

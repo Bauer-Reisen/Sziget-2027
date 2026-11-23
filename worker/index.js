@@ -78,15 +78,28 @@ export default {
           acts: await all('SELECT id, name, day, stage, start, end_time AS "end", created_by AS by, updated FROM acts WHERE deleted = 0 ORDER BY name COLLATE NOCASE'),
           marks: await all('SELECT person_id AS person, act_id AS act, level FROM marks'),
           settings: Object.fromEntries((await all('SELECT key, value FROM settings')).map((r) => [r.key, r.value])),
+          meets: await all('SELECT day, place, time, updated_by AS by, updated FROM meets'),
           now: Date.now(),
         });
       }
 
+      // Treffpunkt für einen Festivaltag (Ort + Uhrzeit; leerer Ort = löschen)
+      const mm = /^\/api\/meets\/(\d{4}-\d{2}-\d{2})$/.exec(path);
+      if (mm && method === 'PUT') {
+        if (!day(mm[1])) return reply(400, { error: 'Das ist kein Festivaltag.' });
+        const place = clip(body.place, 120).trim();
+        if (!place) { await run('DELETE FROM meets WHERE day = ?', mm[1]); return reply(200, { ok: true }); }
+        await run(`INSERT INTO meets (day, place, time, updated_by, updated) VALUES (?, ?, ?, ?, ?)
+                   ON CONFLICT(day) DO UPDATE SET place = excluded.place, time = excluded.time, updated_by = excluded.updated_by, updated = excluded.updated`,
+        mm[1], place, hhmm(body.time), me.id, Date.now());
+        return reply(200, { ok: true });
+      }
+
       // Gemeinsame Einstellung setzen (nur bekannte Schlüssel)
-      const ms = /^\/api\/settings\/(tricount)$/.exec(path);
+      const ms = /^\/api\/settings\/(tricount|planb)$/.exec(path);
       if (ms && method === 'PUT') {
         const value = clip(body.value, 300).trim();
-        if (value && !/^https:\/\/([\w-]+\.)*tricount\.com\/\S*$/i.test(value)) return reply(400, { error: 'Bitte den Link aus Tricount einfügen (beginnt mit https://…tricount.com/).' });
+        if (ms[1] === 'tricount' && value && !/^https:\/\/([\w-]+\.)*tricount\.com\/\S*$/i.test(value)) return reply(400, { error: 'Bitte den Link aus Tricount einfügen (beginnt mit https://…tricount.com/).' });
         await run(`INSERT INTO settings (key, value, updated_by, updated) VALUES (?, ?, ?, ?)
                    ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_by = excluded.updated_by, updated = excluded.updated`, ms[1], value, me.id, Date.now());
         return reply(200, { ok: true });
@@ -108,7 +121,18 @@ export default {
       if (m && method === 'PUT') {
         const name = clip(body.name, 80).trim();
         if (!name) return reply(400, { error: 'Bitte einen Namen eingeben.' });
-        await run('UPDATE acts SET name = ?, day = ?, updated_by = ?, updated = ? WHERE id = ?', name, day(body.day), me.id, Date.now(), m[1]);
+        // Bühne und Uhrzeiten nur ändern, wenn sie mitgeschickt werden (ältere Handys schicken nur Name und Tag)
+        const has = (k) => Object.prototype.hasOwnProperty.call(body, k);
+        await run(`UPDATE acts SET name = ?, day = ?,
+                     stage = CASE WHEN ? THEN ? ELSE stage END,
+                     start = CASE WHEN ? THEN ? ELSE start END,
+                     end_time = CASE WHEN ? THEN ? ELSE end_time END,
+                     updated_by = ?, updated = ? WHERE id = ?`,
+        name, day(body.day),
+        has('stage') ? 1 : 0, clip(body.stage, 40).trim() || null,
+        has('start') ? 1 : 0, hhmm(body.start),
+        has('end') ? 1 : 0, hhmm(body.end),
+        me.id, Date.now(), m[1]);
         return reply(200, { ok: true });
       }
       if (m && method === 'DELETE') {
@@ -144,6 +168,7 @@ export default {
 const normCode = (s) => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
 const clip = (s, n) => String(s ?? '').slice(0, n);
 const day = (s) => (FESTIVAL_DAYS.includes(s) ? s : null); // nur echte Festivaltage, sonst „noch offen"
+const hhmm = (s) => (/^([01]\d|2[0-3]):[0-5]\d$/.test(String(s || '')) ? String(s) : null); // Uhrzeit „21:30", sonst leer
 
 // ---------- Ausweis (Token) ----------
 const enc = new TextEncoder();
