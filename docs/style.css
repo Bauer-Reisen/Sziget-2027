@@ -273,3 +273,6 @@ body.has-tabs .toast { bottom: calc(env(safe-area-inset-bottom) + 84px); }
 .badge-next { border: 1px solid var(--teal); color: var(--teal); }
 .slot-head { margin: 16px 0 8px; font-size: .95rem; color: var(--muted); }
 .legend { margin-top: 12px; }
+
+/* App weitergeben */
+.share .qr { display: block; width: min(220px, 70vw); height: auto; margin: 12px auto; border-radius: 12px; background: #fff; padding: 6px; }

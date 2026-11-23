@@ -25,6 +25,10 @@ export const STEPS = [
     text: 'Die App speichert sich selbst auf dem Handy. Auf der Startseite steht <strong>„Offline bereit ✓"</strong>, wenn alles da ist. Was du ohne Netz einträgst, wartet und geht raus, sobald wieder Netz da ist.',
   },
   {
+    id: 'teilen', stand: '0.6.0', icon: '📲', title: 'App weitergeben',
+    text: 'Unter <strong>Mehr → App weitergeben</strong> gibt es einen <strong>QR-Code</strong> zum Abscannen und einen Knopf zum Teilen per WhatsApp & Co. Den gemeinsamen Code sagst du persönlich – er steht absichtlich nicht im Link.',
+  },
+  {
     id: 'home', stand: '0.1.0', icon: '🏠', title: 'Auf den Home-Bildschirm',
     text: 'Wichtig, vor allem am iPhone: Nur als App auf dem Home-Bildschirm bleibt alles sicher gespeichert. Am iPhone in Safari auf das <strong>Teilen-Symbol</strong>, dann <strong>„Zum Home-Bildschirm"</strong>. Danach dort öffnen und einmal mit Netz anmelden.',
   },
@@ -32,6 +36,14 @@ export const STEPS = [
 
 // Neueste zuerst. Nur sichtbare Neuerungen, keine Reparaturen.
 export const NEWS = [
+  {
+    v: '0.6.0', karte: 'teilen', title: 'App weitergeben',
+    items: [
+      'Unter <strong>Mehr</strong> gibt es jetzt einen <strong>QR-Code</strong>: die anderen scannen ihn einfach mit der Kamera ab.',
+      'Oder <strong>„Link teilen"</strong> tippen und per WhatsApp, Mail & Co. schicken.',
+      'Den gemeinsamen Code sagst du persönlich – er steht absichtlich nicht im Link.',
+    ],
+  },
   {
     v: '0.5.1', karte: 'klein', title: 'Neues App-Symbol',
     items: [
