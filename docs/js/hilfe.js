@@ -13,6 +13,10 @@ export const STEPS = [
     text: 'Im Reiter <strong>Line-up</strong> markierst du jeden Act mit <strong>Muss</strong>, <strong>Gern</strong> oder <strong>Egal</strong>. Tippst du auf einen Act, kommt sein <strong>Steckbrief</strong>: Musikrichtung, wie sie live sind (🔥 = Live-Tipp) und Songs zum Reinhören. Unter <strong>Gemeinsam</strong> siehst du, wen die meisten von uns sehen wollen.',
   },
   {
+    id: 'infos', stand: '0.4.0', icon: 'ℹ️', title: 'Infos ohne Netz',
+    text: 'Im Reiter <strong>Infos</strong>: Notrufnummern, Regeln, was mit darf, unsere <strong>gemeinsame Kasse</strong> (Tricount) und was bei Anreise und Camping am schlauesten ist.',
+  },
+  {
     id: 'heute', stand: '0.1.0', icon: '🗓️', title: 'Unser Tag',
     text: 'Sobald der Zeitplan erscheint (ungefähr im Juni), macht die App daraus einen <strong>Plan für jeden Tag</strong>: wer ist wann wo, wo gibt es Überschneidungen, wo treffen wir uns.',
   },
@@ -28,6 +32,15 @@ export const STEPS = [
 
 // Neueste zuerst. Nur sichtbare Neuerungen, keine Reparaturen.
 export const NEWS = [
+  {
+    v: '0.4.0', karte: 'infos', title: 'Neuer Reiter: Infos',
+    items: [
+      'Unten gibt es jetzt <strong>Infos</strong>: Notrufnummern, Hilfe auf dem Gelände und die Deutsche Botschaft.',
+      'Ticket und Regeln: was mit darf und was nicht.',
+      '<strong>Gemeinsame Kasse:</strong> Eine Person fügt den Tricount-Link ein, dann haben ihn alle sechs.',
+      'Dazu die Analysen: Wie anreisen? Welcher Camping-Bereich?',
+    ],
+  },
   {
     v: '0.3.0', karte: 'lineup', title: 'Steckbriefe zu jedem Act',
     items: [

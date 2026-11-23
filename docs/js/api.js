@@ -1,6 +1,6 @@
 // Verbindung zum Worker. Der Ausweis (Token) liegt nur auf diesem Handy.
-import { API } from './config.js?v=0.3.0';
-import { store } from './store.js?v=0.3.0';
+import { API } from './config.js?v=0.4.0';
+import { store } from './store.js?v=0.4.0';
 
 export const newId = () => (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36));
 

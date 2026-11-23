@@ -77,8 +77,19 @@ export default {
         return reply(200, {
           acts: await all('SELECT id, name, day, stage, start, end_time AS "end", created_by AS by, updated FROM acts WHERE deleted = 0 ORDER BY name COLLATE NOCASE'),
           marks: await all('SELECT person_id AS person, act_id AS act, level FROM marks'),
+          settings: Object.fromEntries((await all('SELECT key, value FROM settings')).map((r) => [r.key, r.value])),
           now: Date.now(),
         });
+      }
+
+      // Gemeinsame Einstellung setzen (nur bekannte Schlüssel)
+      const ms = /^\/api\/settings\/(tricount)$/.exec(path);
+      if (ms && method === 'PUT') {
+        const value = clip(body.value, 300).trim();
+        if (value && !/^https:\/\/([\w-]+\.)*tricount\.com\/\S*$/i.test(value)) return reply(400, { error: 'Bitte den Link aus Tricount einfügen (beginnt mit https://…tricount.com/).' });
+        await run(`INSERT INTO settings (key, value, updated_by, updated) VALUES (?, ?, ?, ?)
+                   ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_by = excluded.updated_by, updated = excluded.updated`, ms[1], value, me.id, Date.now());
+        return reply(200, { ok: true });
       }
 
       // Act eintragen (id vom Handy → zweimal senden schadet nicht)

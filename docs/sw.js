@@ -4,14 +4,14 @@
 // - Updates: app.js merkt eine neue Version (version.json) und lädt mit ?v=<neu> – das geht übers Netz.
 // - Daten aus der Datenbank (Worker) werden hier NICHT gespeichert, die hebt die App selbst auf.
 
-const VERSION = '0.3.0';
+const VERSION = '0.4.0';
 const CACHE = 'insel-' + VERSION;
 const BILDER = 'bilder-insel'; // bleibt über Updates erhalten
 const DATEIEN = [
   './', 'index.html', 'manifest.webmanifest', 'style.css', 'version.json',
   'js/app.js', 'js/config.js', 'js/store.js', 'js/api.js', 'js/ui.js', 'js/ctx.js', 'js/tabs.js',
   'js/hilfe.js', 'js/tour.js', 'js/news.js', 'js/install.js', 'js/offline.js', 'js/start.js', 'js/mehr.js',
-  'js/sync.js', 'js/lineup.js', 'js/actinfo.js',
+  'js/sync.js', 'js/lineup.js', 'js/actinfo.js', 'js/infos.js',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/apple-touch-icon.png',
 ];
 

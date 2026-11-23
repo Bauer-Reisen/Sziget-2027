@@ -37,3 +37,11 @@ CREATE TABLE IF NOT EXISTS marks (
   updated   INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (person_id, act_id)
 );
+
+-- Gemeinsame Einstellungen der Gruppe (z. B. Link zur Tricount-Gruppe). Liegt nur hier, nie im öffentlichen Repo.
+CREATE TABLE IF NOT EXISTS settings (
+  key        TEXT PRIMARY KEY,
+  value      TEXT NOT NULL DEFAULT '',
+  updated_by TEXT,
+  updated    INTEGER NOT NULL DEFAULT 0
+);

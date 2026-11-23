@@ -1,8 +1,8 @@
 // „Mehr": Name ändern, Rundgang, Home-Bildschirm, Offline neu speichern, Abmelden.
-import { esc } from './ui.js?v=0.3.0';
-import { me } from './ctx.js?v=0.3.0';
-import { VERSION } from './config.js?v=0.3.0';
-import { installCard } from './install.js?v=0.3.0';
+import { esc } from './ui.js?v=0.4.0';
+import { me } from './ctx.js?v=0.4.0';
+import { VERSION } from './config.js?v=0.4.0';
+import { installCard } from './install.js?v=0.4.0';
 
 export function renderMore(view) {
   const p = me();
