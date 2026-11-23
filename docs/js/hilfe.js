@@ -9,8 +9,8 @@ export const STEPS = [
     text: 'Für uns sechs auf der Insel: wer wann was sehen will, wo wir uns treffen und was wichtig ist. Alles <strong>auch ohne Netz</strong> – auf dem Festival ist das Netz oft überlastet.',
   },
   {
-    id: 'lineup', stand: '0.2.0', icon: '🎤', title: 'Line-up markieren',
-    text: 'Im Reiter <strong>Line-up</strong> markierst du jeden Act mit <strong>Muss</strong>, <strong>Gern</strong> oder <strong>Egal</strong>. Unter <strong>Gemeinsam</strong> siehst du, wen die meisten von uns sehen wollen. Fehlt ein Act, trägst du ihn einfach ein.',
+    id: 'lineup', stand: '0.3.0', icon: '🎤', title: 'Line-up markieren',
+    text: 'Im Reiter <strong>Line-up</strong> markierst du jeden Act mit <strong>Muss</strong>, <strong>Gern</strong> oder <strong>Egal</strong>. Tippst du auf einen Act, kommt sein <strong>Steckbrief</strong>: Musikrichtung, wie sie live sind (🔥 = Live-Tipp) und Songs zum Reinhören. Unter <strong>Gemeinsam</strong> siehst du, wen die meisten von uns sehen wollen.',
   },
   {
     id: 'heute', stand: '0.1.0', icon: '🗓️', title: 'Unser Tag',
@@ -28,6 +28,14 @@ export const STEPS = [
 
 // Neueste zuerst. Nur sichtbare Neuerungen, keine Reparaturen.
 export const NEWS = [
+  {
+    v: '0.3.0', karte: 'lineup', title: 'Steckbriefe zu jedem Act',
+    items: [
+      'Jeder Act hat jetzt ein <strong>Bild</strong> und die <strong>Musikrichtung</strong>.',
+      'Tippe auf einen Act: Herkunft, kurz erklärt, <strong>wie sie live sind</strong> und ihre bekanntesten Songs – direkt zum Reinhören in Spotify.',
+      '<strong>🔥 Live-Tipp</strong> heißt: Die Kritiker sagen, die Show reißt richtig mit. Oben kannst du nur die Live-Tipps anzeigen.',
+    ],
+  },
   {
     v: '0.2.0', karte: 'lineup', title: 'Das Line-up ist da',
     items: [

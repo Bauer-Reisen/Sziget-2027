@@ -4,13 +4,14 @@
 // - Updates: app.js merkt eine neue Version (version.json) und lädt mit ?v=<neu> – das geht übers Netz.
 // - Daten aus der Datenbank (Worker) werden hier NICHT gespeichert, die hebt die App selbst auf.
 
-const VERSION = '0.2.0';
+const VERSION = '0.3.0';
 const CACHE = 'insel-' + VERSION;
+const BILDER = 'bilder-insel'; // bleibt über Updates erhalten
 const DATEIEN = [
   './', 'index.html', 'manifest.webmanifest', 'style.css', 'version.json',
   'js/app.js', 'js/config.js', 'js/store.js', 'js/api.js', 'js/ui.js', 'js/ctx.js', 'js/tabs.js',
   'js/hilfe.js', 'js/tour.js', 'js/news.js', 'js/install.js', 'js/offline.js', 'js/start.js', 'js/mehr.js',
-  'js/sync.js', 'js/lineup.js',
+  'js/sync.js', 'js/lineup.js', 'js/actinfo.js',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/apple-touch-icon.png',
 ];
 
@@ -51,6 +52,18 @@ self.addEventListener('fetch', (ev) => {
   const req = ev.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+  // Bilder der Acts (von Spotify): einmal laden, dann vom Handy – so gibt es sie auch ohne Netz
+  if (url.hostname.endsWith('spotifycdn.com') || url.hostname === 'i.scdn.co') {
+    ev.respondWith((async () => {
+      const c = await caches.open(BILDER);
+      const kopie = await c.match(req);
+      if (kopie) return kopie;
+      const res = await fetch(req);
+      if (res.ok || res.type === 'opaque') c.put(req, res.clone());
+      return res;
+    })());
+    return;
+  }
   if (url.origin !== location.origin) return; // Worker und fremde Dienste nicht anfassen
   if (url.pathname.endsWith('/version.json')) return; // Update-Prüfung immer frisch
 

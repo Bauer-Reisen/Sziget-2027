@@ -1,10 +1,11 @@
 // Line-up: Acts eintragen, jede Person markiert Muss / Gern / Egal, alle sehen die Markierungen der Gruppe.
 // Geht auch ohne Netz (Warteschlange in sync.js).
-import { esc, dialog, toast } from './ui.js?v=0.2.0';
-import { ctx, me, fmtDate } from './ctx.js?v=0.2.0';
-import { store } from './store.js?v=0.2.0';
-import { FESTIVAL_DAYS, LINEUP_STAND } from './config.js?v=0.2.0';
-import { lineup, setMark, addAct, editAct, deleteAct, onChange, pending, lastSync, flush, refresh } from './sync.js?v=0.2.0';
+import { esc, dialog, toast } from './ui.js?v=0.3.0';
+import { ctx, me, fmtDate } from './ctx.js?v=0.3.0';
+import { store } from './store.js?v=0.3.0';
+import { FESTIVAL_DAYS, LINEUP_STAND } from './config.js?v=0.3.0';
+import { ACT_INFO, INFO_STAND, LIVE_LABEL, spotifyArtist, spotifySearch, spotifyEmbed } from './actinfo.js?v=0.3.0';
+import { lineup, setMark, addAct, editAct, deleteAct, onChange, pending, lastSync, flush, refresh } from './sync.js?v=0.3.0';
 
 const LEVELS = [
   ['muss', 'Muss'],
@@ -18,6 +19,7 @@ const order = () => (ctx.people?.persons || []).map((p) => p.id);
 
 let mode = store.get('lineupMode') || 'alle'; // alle | gruppe | meine
 let query = '';
+let liveOnly = store.get('lineupLive') === '1';
 let unsub = null;
 
 export function renderLineup(view) {
@@ -33,6 +35,7 @@ export function renderLineup(view) {
         <button type="button" data-mode="gruppe">Gemeinsam</button>
         <button type="button" data-mode="meine">Meine</button>
       </div>
+      <button type="button" class="chip" data-act="live">🔥 Nur Live-Tipps</button>
       <div class="search">
         <input type="search" id="lu-q" placeholder="Act suchen …" autocomplete="off" enterkeyhint="search" value="${esc(query)}">
       </div>
@@ -49,6 +52,11 @@ export function renderLineup(view) {
   view.querySelector('#lu-q').addEventListener('input', (e) => { query = e.target.value; paintList(view); });
   view.querySelector('[data-act=add]').addEventListener('click', () => addDialog(view));
   view.querySelector('[data-act=help]').addEventListener('click', () => explain(true));
+  view.querySelector('[data-act=live]').addEventListener('click', () => {
+    liveOnly = !liveOnly;
+    store.set('lineupLive', liveOnly ? '1' : '');
+    paint(view);
+  });
 
   // Markieren und Bearbeiten (ein Klick-Empfänger für die ganze Liste)
   view.querySelector('#lu-list').addEventListener('click', (e) => {
@@ -59,8 +67,8 @@ export function renderLineup(view) {
       setMark(me().id, act, mine === lv.dataset.level ? '' : lv.dataset.level); // nochmal tippen = zurücknehmen
       return;
     }
-    const ed = e.target.closest('[data-edit]');
-    if (ed) editDialog(ed.dataset.edit);
+    const det = e.target.closest('[data-detail]');
+    if (det) detailDialog(det.dataset.detail);
   });
 
   unsub?.();
@@ -73,6 +81,7 @@ const myLevel = (lu, act) => lu.marks.find((m) => m.person === me()?.id && m.act
 
 function paint(view) {
   view.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+  view.querySelector('[data-act=live]').setAttribute('aria-pressed', String(liveOnly));
   const lu = lineup();
   const t = lastSync();
   view.querySelector('#lu-stand').textContent = `${LINEUP_STAND} · ${lu.acts.length} Acts${t ? ` · abgeglichen ${new Date(t).toLocaleString('de-DE', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' })}` : ''}`;
@@ -95,7 +104,8 @@ function paintList(view, lu = lineup()) {
     if (!byAct.has(m.act)) byAct.set(m.act, []);
     byAct.get(m.act).push(m);
   }
-  let acts = lu.acts.filter((a) => !q || norm(a.name).includes(q));
+  let acts = lu.acts.filter((a) => (!q || norm(a.name).includes(q) || norm(ACT_INFO[a.id]?.genre || '').includes(q))
+    && (!liveOnly || ACT_INFO[a.id]?.live === 3));
   const score = (a) => (byAct.get(a.id) || []).reduce((s, m) => s + (m.level === 'muss' ? 2 : m.level === 'gern' ? 1 : 0), 0);
 
   if (mode === 'meine') acts = acts.filter((a) => ['muss', 'gern'].includes(myLevel(lu, a.id)))
@@ -105,6 +115,7 @@ function paintList(view, lu = lineup()) {
   if (!acts.length) {
     list.innerHTML = `<p class="empty">${
       q ? 'Nichts gefunden. Unten kannst du den Act eintragen.'
+        : liveOnly ? 'Hier gibt es gerade keine Live-Tipps.'
         : mode === 'meine' ? 'Du hast noch nichts mit Muss oder Gern markiert.'
           : mode === 'gruppe' ? 'Noch hat niemand etwas mit Muss oder Gern markiert.'
             : 'Noch keine Acts eingetragen.'}</p>`;
@@ -123,10 +134,17 @@ function paintList(view, lu = lineup()) {
       gern.length ? `<span class="who-l who-gern">Gern: ${esc(gern.join(', '))}</span>` : '',
     ].join('');
     const together = muss.length + gern.length + (mode !== 'gruppe' && ['muss', 'gern'].includes(mine) ? 1 : 0);
+    const info = ACT_INFO[a.id];
     return `
       <article class="act${mine ? ` is-${mine}` : ''}" data-id="${esc(a.id)}">
         <div class="act-top">
-          <button type="button" class="act-name" data-edit="${esc(a.id)}">${esc(a.name)}</button>
+          <button type="button" class="act-main" data-detail="${esc(a.id)}" aria-label="${esc(a.name)}: Infos und Reinhören">
+            ${info?.img ? `<img class="act-img" src="${esc(info.img)}" alt="" width="52" height="52" crossorigin="anonymous" referrerpolicy="no-referrer">` : `<span class="act-img act-img-none" aria-hidden="true">${esc(a.name.slice(0, 1))}</span>`}
+            <span class="act-text">
+              <span class="act-name">${esc(a.name)}</span>
+              <span class="act-genre">${info?.live === 3 ? '<span class="act-live">🔥 Live-Tipp</span> ' : ''}${esc(info?.genre || 'Antippen für mehr')}</span>
+            </span>
+          </button>
           ${a.day ? `<span class="act-day">${esc(dayShort(a.day))}</span>` : ''}
           ${together >= 2 ? `<span class="act-count" title="So viele von uns wollen hin">${together} 👥</span>` : ''}
         </div>
@@ -173,6 +191,56 @@ async function addDialog(view) {
   toast('Eingetragen. Jetzt gleich markieren!');
 }
 
+// Steckbrief: Bild, Stil, Herkunft, kurz erklärt, wie sie live sind, Songs zum Reinhören
+async function detailDialog(id) {
+  const a = lineup().acts.find((x) => x.id === id);
+  if (!a) return;
+  const info = ACT_INFO[id];
+  const flames = info?.live ? '🔥'.repeat(info.live) : '';
+  const hits = info?.hits?.length
+    ? `<ul class="ad-hits">${info.hits.map((h) => `<li><a href="${esc(spotifySearch(`${a.name} ${h}`))}" target="_blank" rel="noopener">▶ ${esc(h)}</a></li>`).join('')}</ul>`
+    : '';
+  const spLink = info?.sp ? spotifyArtist(info.sp) : spotifySearch(a.name);
+  const body = info ? `
+    <div class="ad">
+      ${info.img ? `<img class="ad-img" src="${esc(info.img)}" alt="" crossorigin="anonymous" referrerpolicy="no-referrer">` : ''}
+      <p class="ad-meta"><strong>${esc(info.genre)}</strong><br>${esc(info.from)}${a.day ? ` · spielt ${esc(dayShort(a.day))}` : ''}</p>
+      <p>${esc(info.about)}</p>
+      <div class="ad-live${info.live === 3 ? ' is-top' : ''}">
+        <h3>Wie sind sie live? ${flames ? `<span>${flames} ${esc(LIVE_LABEL[info.live])}</span>` : ''}</h3>
+        <p>${esc(info.liveText)}</p>
+      </div>
+      <h3>Reinhören</h3>
+      ${hits}
+      ${info.sp ? '<div class="ad-player"><button type="button" class="btn btn-small" data-play>▶ Hörproben hier abspielen</button></div>' : ''}
+      <p><a class="btn btn-wide" href="${esc(spLink)}" target="_blank" rel="noopener">${info.sp ? 'In Spotify öffnen' : 'In Spotify suchen'}</a></p>
+      <p class="hint">${esc(INFO_STAND)} · eigene Zusammenfassung aus Presse und Live-Kritiken.</p>
+    </div>` : `
+    <div class="ad">
+      <p>${a.day ? `Spielt ${esc(dayShort(a.day))}. ` : ''}Zu diesem Act gibt es noch keinen Steckbrief.</p>
+      <p><a class="btn btn-wide" href="${esc(spotifySearch(a.name))}" target="_blank" rel="noopener">In Spotify suchen</a></p>
+    </div>`;
+
+  // Spotify-Player erst auf Wunsch laden (braucht Netz)
+  const wirePlayer = () => {
+    const btn = document.querySelector('dialog[open] [data-play]');
+    btn?.addEventListener('click', () => {
+      if (!navigator.onLine) { toast('Dafür braucht es Netz.'); return; }
+      btn.parentElement.innerHTML = `<iframe class="ad-iframe" src="${esc(spotifyEmbed(info.sp))}" title="Spotify: ${esc(a.name)}" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;
+    });
+  };
+  const p = dialog({
+    title: a.name,
+    body,
+    buttons: [{ label: 'Ändern', value: 'edit' }, { label: 'Schließen', value: 'close', primary: true }],
+  });
+  wirePlayer();
+  const dlg = document.querySelector("dialog[open]");
+  requestAnimationFrame(() => { if (dlg) dlg.scrollTop = 0; }); // oben anfangen, nicht beim Knopf unten
+  const res = await p;
+  if (res?.value === 'edit') editDialog(id);
+}
+
 async function editDialog(id) {
   const a = lineup().acts.find((x) => x.id === id);
   if (!a) return;
@@ -215,8 +283,10 @@ async function explain(force) {
     body: `
       <ul class="explain">
         <li>Tippe bei jedem Act <strong>Muss</strong>, <strong>Gern</strong> oder <strong>Egal</strong>. Nochmal tippen nimmt es zurück.</li>
+        <li>Tippe auf <strong>Bild oder Namen</strong>: Steckbrief mit Musikrichtung, Herkunft, wie sie live sind und Songs zum Reinhören.</li>
+        <li><strong>🔥 Live-Tipp</strong> heißt: Die Kritiker sagen, die Show reißt mit.</li>
         <li><strong>Gemeinsam</strong> zeigt oben, wen die meisten von uns sehen wollen.</li>
-        <li>Fehlt ein Act? Unten auf <strong>„+ Act eintragen"</strong>. Antippen des Namens ändert oder löscht ihn.</li>
+        <li>Fehlt ein Act? Unten auf <strong>„+ Act eintragen"</strong>. Ändern oder löschen geht im Steckbrief.</li>
         <li>Geht auch ohne Netz – deine Markierungen werden später gesendet.</li>
       </ul>`,
     buttons: [{ label: 'Alles klar', value: true, primary: true }],

@@ -3,9 +3,9 @@
 // - Jede Änderung kommt sofort in die eigene Ansicht UND in die Warteschlange.
 // - Die Warteschlange wird gesendet: beim Öffnen, wenn Netz zurückkommt, und jede Minute, solange die App offen ist.
 // - Doppeltes Senden ist harmlos: neue Acts tragen eine Kennung vom Handy, Markierungen gehören je einer Person.
-import { call, ApiError, newId } from './api.js?v=0.2.0';
-import { store } from './store.js?v=0.2.0';
-import { toast } from './ui.js?v=0.2.0';
+import { call, ApiError, newId } from './api.js?v=0.3.0';
+import { store } from './store.js?v=0.3.0';
+import { toast } from './ui.js?v=0.3.0';
 
 const listeners = new Set();
 export const onChange = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
