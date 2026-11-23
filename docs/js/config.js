@@ -1,5 +1,5 @@
 // Feste Einstellungen der App. Hier steht nichts Geheimes.
-export const VERSION = '0.5.0';
+export const VERSION = '0.5.1';
 
 // Adresse des Workers (die Tür zu den geteilten Daten). Beim Testen am PC läuft er lokal.
 const LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);

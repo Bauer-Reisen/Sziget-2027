@@ -33,6 +33,13 @@ export const STEPS = [
 // Neueste zuerst. Nur sichtbare Neuerungen, keine Reparaturen.
 export const NEWS = [
   {
+    v: '0.5.1', karte: 'klein', title: 'Neues App-Symbol',
+    items: [
+      'Die App hat ein buntes neues Symbol: Sonnenuntergang über der Insel.',
+      'Auf dem iPhone erscheint es erst, wenn du die App einmal vom Home-Bildschirm löschst und neu hinzufügst (Teilen → Zum Home-Bildschirm).',
+    ],
+  },
+  {
     v: '0.5.0', karte: 'heute', title: 'Neuer Reiter: Heute',
     items: [
       'Unter <strong>Heute</strong> steht für jeden Festivaltag, wer wann wo hin will – mit Namen.',

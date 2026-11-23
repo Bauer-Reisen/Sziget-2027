@@ -1,10 +1,10 @@
 // Startseite: Countdown, Offline-Zustand, Home-Bildschirm-Hinweis, was als Nächstes kommt.
-import { esc } from './ui.js?v=0.5.0';
-import { me, festivalStatus, fmtDate } from './ctx.js?v=0.5.0';
-import { FESTIVAL } from './config.js?v=0.5.0';
-import { installBanner, wireInstall } from './install.js?v=0.5.0';
-import { offlineState, online } from './offline.js?v=0.5.0';
-import { lineup, onChange } from './sync.js?v=0.5.0';
+import { esc } from './ui.js?v=0.5.1';
+import { me, festivalStatus, fmtDate } from './ctx.js?v=0.5.1';
+import { FESTIVAL } from './config.js?v=0.5.1';
+import { installBanner, wireInstall } from './install.js?v=0.5.1';
+import { offlineState, online } from './offline.js?v=0.5.1';
+import { lineup, onChange } from './sync.js?v=0.5.1';
 
 function countdown() {
   const s = festivalStatus();

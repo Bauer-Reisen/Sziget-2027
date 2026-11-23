@@ -1,21 +1,38 @@
 // Erzeugt die App-Icons als PNG (ohne Zusatzpakete). Aufruf: node scripts/make-icons.js
-// Motiv: Sonne über Wellen (die Insel in der Donau) auf Nachthimmel.
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
+// Motiv: Sonnenuntergang hinter der Insel in der Donau – bunte Strahlen, grüne Insel, Wellen.
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+const TOP = [0xff, 0x3d, 0x8b];   // Pink
+const LOW = [0xff, 0x9a, 0x3c];   // Orange am Horizont
+const SUN = [0xff, 0xd8, 0x4d];
+const RING = [0xff, 0xf3, 0xb0];
+const ISLAND = [0x16, 0xb0, 0x7a];
+const ISLAND_DARK = [0x0f, 0x7d, 0x5a];
+const WATER = [0x2b, 0x1f, 0x6e];
+const WAVE = [0x3e, 0xd9, 0xd0];
+const H = 330; // Horizont
 
-const NIGHT = [0x1b, 0x16, 0x3a];
-const SUN = [0xff, 0xc8, 0x57];
-const CORAL = [0xff, 0x6b, 0x5a];
-const WAVE = [0x3e, 0xc9, 0xb6];
+const hill = (x) => H - 78 * Math.sqrt(Math.max(0, 1 - ((x - 256) / 170) ** 2));
 
-// Farbe an Stelle (x, y) im 512er-Raster
 function colorAt(x, y) {
-  const wave = (y0) => y0 + 14 * Math.sin((x / 512) * Math.PI * 4);
-  if (Math.abs(y - wave(372)) <= 11) return WAVE;
-  if (Math.abs(y - wave(420)) <= 11) return WAVE;
-  const d = Math.hypot(x - 256, y - 300);
-  if (y < wave(372) - 22 && d <= 150) return d <= 112 ? SUN : CORAL;
-  return NIGHT;
+  // Wasser mit zwei Wellen
+  if (y > H + 6) {
+    const w = (y0) => y0 + 10 * Math.sin((x / 512) * Math.PI * 5);
+    if (Math.abs(y - w(H + 62)) <= 10 || Math.abs(y - w(H + 118)) <= 10) return WAVE;
+    return mix(WATER, [0x1b, 0x16, 0x3a], Math.min(1, (y - H) / 220));
+  }
+  // Insel vor der Sonne
+  if (Math.abs(x - 256) < 170 && y >= hill(x)) return y > hill(x) + 22 ? ISLAND_DARK : ISLAND;
+  // Sonne
+  const d = Math.hypot(x - 256, y - (H - 40));
+  if (d <= 92) return SUN;
+  if (d <= 104) return RING;
+  // Himmel: Verlauf + Strahlen
+  const sky = mix(TOP, LOW, Math.max(0, Math.min(1, (y + 40) / (H + 40))));
+  const ang = Math.atan2(y - (H - 40), x - 256);
+  const ray = Math.floor((ang + Math.PI) / (Math.PI / 9)) % 2 === 0;
+  return ray ? mix(sky, [0xff, 0xff, 0xff], 0.22) : sky;
 }
 
 function crc32(buf) {
@@ -67,10 +84,5 @@ writeFileSync(new URL('apple-touch-icon.png', dir), png(180));
 writeFileSync(new URL('icon-192.png', dir), png(192));
 writeFileSync(new URL('icon-512.png', dir), png(512));
 writeFileSync(new URL('icon-maskable-512.png', dir), png(512, 80)); // mit Rand für Android-Formen
-const wavePath = (y0) => {
-  let d = `M0 ${y0}`;
-  for (let x = 16; x <= 512; x += 16) d += ` L${x} ${(y0 + 14 * Math.sin((x / 512) * Math.PI * 4)).toFixed(1)}`;
-  return d;
-};
-writeFileSync(new URL('icon.svg', dir), `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><clipPath id="c"><rect width="512" height="340"/></clipPath></defs><rect width="512" height="512" rx="96" fill="#1b163a"/><g clip-path="url(#c)"><circle cx="256" cy="300" r="150" fill="#ff6b5a"/><circle cx="256" cy="300" r="112" fill="#ffc857"/></g><g fill="none" stroke="#3ec9b6" stroke-width="22" stroke-linecap="round"><path d="${wavePath(372)}"/><path d="${wavePath(420)}"/></g></svg>\n`);
+writeFileSync(new URL('favicon-64.png', dir), png(64));
 console.log('Icons erstellt in docs/icons/');
