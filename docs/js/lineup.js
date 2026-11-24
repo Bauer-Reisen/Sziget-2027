@@ -1,11 +1,11 @@
 // Line-up: Acts eintragen, jede Person markiert Muss / Gern / Egal, alle sehen die Markierungen der Gruppe.
 // Geht auch ohne Netz (Warteschlange in sync.js).
-import { esc, dialog, toast } from './ui.js?v=0.6.0';
-import { ctx, me, fmtDate } from './ctx.js?v=0.6.0';
-import { store } from './store.js?v=0.6.0';
-import { FESTIVAL_DAYS, LINEUP_STAND } from './config.js?v=0.6.0';
-import { ACT_INFO, INFO_STAND, LIVE_LABEL, spotifyArtist, spotifySearch, spotifyEmbed } from './actinfo.js?v=0.6.0';
-import { lineup, setMark, addAct, editAct, deleteAct, onChange, pending, lastSync, flush, refresh } from './sync.js?v=0.6.0';
+import { esc, dialog, toast } from './ui.js?v=0.6.1';
+import { ctx, me, fmtDate } from './ctx.js?v=0.6.1';
+import { store } from './store.js?v=0.6.1';
+import { FESTIVAL_DAYS, LINEUP_STAND } from './config.js?v=0.6.1';
+import { ACT_INFO, INFO_STAND, LIVE_LABEL, spotifyArtist, spotifySearch, spotifyEmbed } from './actinfo.js?v=0.6.1';
+import { lineup, setMark, addAct, editAct, deleteAct, onChange, pending, lastSync, flush, refresh } from './sync.js?v=0.6.1';
 
 const LEVELS = [
   ['muss', 'Muss'],

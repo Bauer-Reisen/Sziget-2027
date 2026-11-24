@@ -1,11 +1,11 @@
 // Reiter „Heute": Plan für einen Festivaltag – wer will wann wo hin, Überschneidungen, Treffpunkt.
 // Festivaltag läuft von 6 Uhr bis 6 Uhr: ein Act um 01:30 gehört zum Tag davor.
-import { esc, dialog, toast } from './ui.js?v=0.6.0';
-import { ctx, me, festivalDayOf, fmtDate } from './ctx.js?v=0.6.0';
-import { store } from './store.js?v=0.6.0';
-import { FESTIVAL_DAYS, DAY_START_HOUR } from './config.js?v=0.6.0';
-import { lineup, meets, setMeet, settings, setSetting, onChange } from './sync.js?v=0.6.0';
-import { ACT_INFO } from './actinfo.js?v=0.6.0';
+import { esc, dialog, toast } from './ui.js?v=0.6.1';
+import { ctx, me, festivalDayOf, fmtDate } from './ctx.js?v=0.6.1';
+import { store } from './store.js?v=0.6.1';
+import { FESTIVAL_DAYS, DAY_START_HOUR } from './config.js?v=0.6.1';
+import { lineup, meets, setMeet, settings, setSetting, onChange } from './sync.js?v=0.6.1';
+import { ACT_INFO } from './actinfo.js?v=0.6.1';
 
 let scope = store.get('heuteScope') || 'gruppe'; // gruppe | ich
 let sel = null;

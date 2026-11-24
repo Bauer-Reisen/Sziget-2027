@@ -1,21 +1,21 @@
 // Einstieg der App: Code eingeben → Name wählen → Seiten.
 // Läuft auch ohne Netz: Ausweis und die sechs Namen liegen auf dem Handy.
-import { VERSION } from './config.js?v=0.6.0';
-import { store } from './store.js?v=0.6.0';
-import { login, loggedIn, logout, cachedPeople, fetchPeople, ApiError } from './api.js?v=0.6.0';
-import { esc, dialog, toast } from './ui.js?v=0.6.0';
-import { runTour } from './tour.js?v=0.6.0';
-import { unseen, showNews, NEWS } from './news.js?v=0.6.0';
-import { ctx, me } from './ctx.js?v=0.6.0';
-import { renderStart } from './start.js?v=0.6.0';
-import { wireShare } from './teilen.js?v=0.6.0';
-import { renderMore } from './mehr.js?v=0.6.0';
-import { renderTabs, hideTabs } from './tabs.js?v=0.6.0';
-import { registerSw, refreshOffline } from './offline.js?v=0.6.0';
-import { renderLineup } from './lineup.js?v=0.6.0';
-import { renderHeute } from './heute.js?v=0.6.0';
-import { renderInfos } from './infos.js?v=0.6.0';
-import { startSync } from './sync.js?v=0.6.0';
+import { VERSION } from './config.js?v=0.6.1';
+import { store } from './store.js?v=0.6.1';
+import { login, loggedIn, logout, cachedPeople, fetchPeople, ApiError } from './api.js?v=0.6.1';
+import { esc, dialog, toast } from './ui.js?v=0.6.1';
+import { runTour } from './tour.js?v=0.6.1';
+import { unseen, showNews, NEWS } from './news.js?v=0.6.1';
+import { ctx, me } from './ctx.js?v=0.6.1';
+import { renderStart } from './start.js?v=0.6.1';
+import { wireShare } from './teilen.js?v=0.6.1';
+import { renderMore } from './mehr.js?v=0.6.1';
+import { renderTabs, hideTabs } from './tabs.js?v=0.6.1';
+import { registerSw, refreshOffline } from './offline.js?v=0.6.1';
+import { renderLineup } from './lineup.js?v=0.6.1';
+import { renderHeute } from './heute.js?v=0.6.1';
+import { renderInfos } from './infos.js?v=0.6.1';
+import { startSync } from './sync.js?v=0.6.1';
 
 const view = document.getElementById('view');
 const scroller = document.getElementById('scroller'); // nur dieser Bereich scrollt (fester Rahmen)

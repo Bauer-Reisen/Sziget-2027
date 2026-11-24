@@ -37,18 +37,18 @@ export const STEPS = [
 // Neueste zuerst. Nur sichtbare Neuerungen, keine Reparaturen.
 export const NEWS = [
   {
+    v: '0.6.1', karte: 'klein', title: 'Echtes Sziget-Symbol',
+    items: [
+      'Die App trägt jetzt das rote Sziget-Zeichen.',
+      'Auf dem iPhone erscheint es erst, wenn du die App einmal vom Home-Bildschirm löschst und neu hinzufügst (Safari → Teilen → Zum Home-Bildschirm).',
+    ],
+  },
+  {
     v: '0.6.0', karte: 'teilen', title: 'App weitergeben',
     items: [
       'Unter <strong>Mehr</strong> gibt es jetzt einen <strong>QR-Code</strong>: die anderen scannen ihn einfach mit der Kamera ab.',
       'Oder <strong>„Link teilen"</strong> tippen und per WhatsApp, Mail & Co. schicken.',
       'Den gemeinsamen Code sagst du persönlich – er steht absichtlich nicht im Link.',
-    ],
-  },
-  {
-    v: '0.5.1', karte: 'klein', title: 'Neues App-Symbol',
-    items: [
-      'Die App hat ein buntes neues Symbol: Sonnenuntergang über der Insel.',
-      'Auf dem iPhone erscheint es erst, wenn du die App einmal vom Home-Bildschirm löschst und neu hinzufügst (Teilen → Zum Home-Bildschirm).',
     ],
   },
   {

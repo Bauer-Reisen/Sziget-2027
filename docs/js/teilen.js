@@ -1,6 +1,6 @@
 // „App weitergeben": QR-Code zum Abscannen und Teilen-Knopf (WhatsApp, Mail …).
 // Weitergegeben wird nur der Link. Der gemeinsame Code steht absichtlich nicht drin – den sagt man persönlich.
-import { toast } from './ui.js?v=0.6.0';
+import { toast } from './ui.js?v=0.6.1';
 
 const LINK = 'https://bauer-reisen.github.io/Sziget-2027/';
 const TEXT = 'Unsere Festival-App für Sziget 2027 – öffnen, zum Home-Bildschirm hinzufügen, dann den gemeinsamen Code eingeben (sag ich dir persönlich):';

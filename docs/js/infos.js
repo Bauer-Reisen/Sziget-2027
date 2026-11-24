@@ -1,7 +1,7 @@
 // Reiter „Infos": alles Wichtige zum Nachlesen – auch ohne Netz.
 // Notfall, gemeinsame Kasse (Tricount-Link liegt nur beim Worker), Regeln, Anreise- und Camping-Analyse.
-import { esc, dialog, toast } from './ui.js?v=0.6.0';
-import { settings, setSetting, onChange } from './sync.js?v=0.6.0';
+import { esc, dialog, toast } from './ui.js?v=0.6.1';
+import { settings, setSetting, onChange } from './sync.js?v=0.6.1';
 
 const TRICOUNT = /^https:\/\/([\w-]+\.)*tricount\.com\/\S*$/i;
 
